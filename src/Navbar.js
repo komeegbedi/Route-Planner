@@ -4,8 +4,8 @@ import { faRoute } from '@fortawesome/free-solid-svg-icons';
 
 const Navbar = () => {
     return (
-        <nav className="bg-gray-800">
-            <div className="max-w-screen-xl flex flex-wrap justify-between max-auto p-4">
+        <nav>
+            <div className=" relative flex flex-wrap justify-between max-auto p-8">
                 <Link to="/" className="text-slate-300 text-2xl flex items-center space-x-3 rtl:space-x-reverse"> 
                     <FontAwesomeIcon icon={faRoute}/> 
                     <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Route Planner</span>
@@ -17,7 +17,7 @@ const Navbar = () => {
                             <Link to="/Login" className="block py-2 px-3 text-white">Login</Link>
                         </li>
                         <li>
-                            <Link to="/GetStarted" className="block py-2 px-4 text-white bg-blue-700 text-sm text-center rounded-lg font-medium">Get Started</Link>
+                            <Link to="/GetStarted" className="block py-2 px-4 text-white bg-sky-500/100 text-sm text-center rounded-lg font-medium">Get Started</Link>
                         </li>
 
                     </ul>

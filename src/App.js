@@ -6,7 +6,7 @@ import Navbar from './Navbar';
 function App() {
   return (
     <Router>
-      <div className="App">
+      <div className="App bg-slate-900">
       <Navbar />
         <div className="content">
           <Routes>
