@@ -9,11 +9,8 @@ const HeroSection = () => {
         <section className="bg-center bg-no-repeat bg-[url('./images/vecteezy_route-icon-between-two-points-with-dotted-path-and-location-pin_22188254.png')] bg-blend-multiply bg-contain h-screen place-items-center">
             <div className="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 h-4/5">
                 <div className="mr-auto place-self-center lg:col-span-7">
-                    <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-normal leading-normal md:text-5xl xl:text-6xl dark:text-white"> Let Us <span className='text-teal-500'>Optimize</span> Your Routes, Save Time.</h1>
-                    {/* <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">This essay contains a description of a thing/situation so that the reader seems to see.</p>
-                    <Link to="/GetStarted" className="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-white rounded-lg bg-gradient-to-l from-teal-400">
-                        Get started  <FontAwesomeIcon icon={faArrowRight} />
-                    </Link> */}
+                    <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-normal leading-normal md:text-5xl xl:text-6xl dark:text-white"> Let Us <span className='text-teal-500'>Optimize</span> Your Routes</h1>
+                    <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">Less Driving = Save Gas, Save Time</p>
                     
                     <form class="max-w-sm mt-8">
                     <input type="text" className="mb-5 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-gray-600 placeholder-gray-700" value="Enter Starting Point (e.g. 123 Main St)"/>
