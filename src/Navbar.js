@@ -14,10 +14,13 @@ const Navbar = () => {
                 <div className="hidden w-full md:block md:w-auto" id="navbar-default">
                     <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0">
                         <li>
-                            <Link to="/Login" className="block py-2 px-3 text-white">Login</Link>
+                            <Link to="/About" className="block py-2 px-3 text-white">About</Link>
                         </li>
                         <li>
-                            <Link to="/GetStarted" className="block py-2 px-4 text-white bg-sky-500/100 text-sm text-center rounded-lg font-medium">Get Started</Link>
+                            <Link to="/Login" className="block py-2 px-3 text-white">Log in</Link>
+                        </li>
+                        <li>
+                            <Link to="/GetStarted" className="block py-2 px-4 text-black bg-slate-50 text-sm text-center rounded-lg font-medium">Sign up</Link>
                         </li>
 
                     </ul>

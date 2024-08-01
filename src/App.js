@@ -6,7 +6,7 @@ import Navbar from './Navbar';
 function App() {
   return (
     <Router>
-      <div className="App bg-gradient-to-r from-slate-800 to-cyan-900">
+      <div className="App bg-black">
       <Navbar />
         <div className="content">
           <Routes>
