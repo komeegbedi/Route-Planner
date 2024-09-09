@@ -39,6 +39,7 @@ const HeroSection = () => {
     const handleDeleteField = (index, event) => {
         const values = [...inputFields];
         event.preventDefault();
+        
         if(values.length > 2){
             values.splice(index, 1);
             setInputFields(values);
@@ -94,7 +95,7 @@ const HeroSection = () => {
                    
                     </form>
                 </div>
-                
+
                 <div className="hidden lg:mt-0 lg:col-span-5 lg:flex rotate-12 opacity-80">
                     <img src= {heroImage} alt="mockup" className='h-max'/>
                 </div>                
