@@ -1,11 +1,12 @@
 //This file handles the design of the hero section and also the logic to dynamically add an input field when a button is clicked
 
-import heroImage from './images/vecteezy_smartphone-mobile-gps-navigation-illustration-isolated-map_14501013.png'; 
+// import heroImage from './images/vecteezy_smartphone-mobile-gps-navigation-illustration-isolated-map_14501013.png'; 
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AddressAutofill } from '@mapbox/search-js-react';
 import React, { useState } from 'react';
+import processFormData from './processData';
 
 
 const HeroSection = () => {
@@ -46,18 +47,24 @@ const HeroSection = () => {
         }
     };
 
+    // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    processFormData(inputFields);
+  };
+
     
     return ( 
-        <section className="h-screen  bg-center bg-no-repeat bg-[url('./images/vecteezy_route-icon-between-two-points-with-dotted-path-and-location-pin_22188254.png')] bg-blend-multiply bg-contain">
+        <section className="h-screen">
             <div className="flex flex-col justify-center items-center max-w-screen-xl px-4 py-8 mx-auto lg:py-16 h-4/5">
                 <div className="w-full">
-                    <h1 className="mb-4 text-4xl text-center font-extrabold tracking-wide leading-normal md:text-5xl xl:text-6xl dark:text-white gradient-text"> 
+                    <h1 className="mb-4 text-6xl text-center font-extrabold tracking-wide leading-normal md:text-5xl xl:text-6xl dark:text-white gradient-text"> 
                         Let Us<span className='text-teal-500'> Optimize </span> Your Routes
                     </h1>
                     <p className="mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400 text-center">Less Driving = Save Gas. Save Time.</p>
                     
                     <div className="w-full">
-                        <form className="flex flex-col max-w-sm mt-10 m-auto">
+                        <form className="flex flex-col max-w-sm mt-10 m-auto" onSubmit={handleSubmit}>
 
                         {/* ------------ Renders the input field to the page ------------ */}
                         {inputFields.map((input, index) => (
@@ -69,7 +76,7 @@ const HeroSection = () => {
                                             type="text"
                                             value={input.value}
                                             onChange={event => handleInputChange(index, event)}
-                                            name={"address-"+index} autoComplete="address-line2" 
+                                            name={"address-"+index} autoComplete={"address-line"+index}
                                             className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg w-full focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:border-gray-600 placeholder-gray-600" placeholder="Enter Stop Address"
                                         />
                                     </AddressAutofill>

@@ -1,10 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+h1,h2,h3,h4,h5,h6{
+  font-family: "Playfair Display", serif;
+}
+
+body{
+  font-family: "Roboto", sans-serif;
+}
+
 nav{
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .gradient-text {
   /* Fallback: Set a background color. */
-  background-color: #CA4246;
+  background-color: #ffffff;
   
   /* Create the gradient. */
   background: linear-gradient(to right, black, white, black);
@@ -15,6 +25,7 @@ nav{
 
   /* Use the text as a mask for the background. */
   /* This will show the gradient as a text color rather than element bg. */
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent; 
   
@@ -36,6 +47,9 @@ nav{
   color: transparent;
 }
 
+h1.gradient-text{
+  line-height: 1.2;
+}
 
 /* Move the background and make it smaller. */
 /* Animation shown when entering the page and after the hover animation. */
@@ -67,8 +81,6 @@ nav{
   
 h1.gradient-text{
   display: block;
-  /* margin-left: auto;
-  margin-right: auto; */
   cursor: pointer;
 }
 
