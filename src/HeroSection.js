@@ -73,7 +73,7 @@ const HeroSection = () => {
                                             type="text"
                                             value={input.value}
                                             onChange={event => handleInputChange(index, event)}
-                                            name={"address-"+index} autoComplete={"address-line"+index}
+                                            name={"address-"+index} autoComplete={"address-line-"+index}
                                             className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg w-full focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:border-gray-600 placeholder-gray-600" placeholder="Enter Stop Address"
                                         />
                                     </AddressAutofill>
