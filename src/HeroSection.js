@@ -1,13 +1,11 @@
 //This file handles the design of the hero section and also the logic to dynamically add an input field when a button is clicked
 
-// import heroImage from './images/vecteezy_smartphone-mobile-gps-navigation-illustration-isolated-map_14501013.png'; 
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AddressAutofill } from '@mapbox/search-js-react';
 import React, { useState } from 'react';
 import processFormData from './processData';
-
 
 const HeroSection = () => {
 
@@ -52,16 +50,15 @@ const HeroSection = () => {
     e.preventDefault();
     processFormData(inputFields);
   };
-
-    
+   
     return ( 
         <section className="h-screen">
             <div className="flex flex-col justify-center items-center max-w-screen-xl px-4 py-8 mx-auto lg:py-16 h-4/5">
                 <div className="w-full">
-                    <h1 className="mb-4 text-6xl text-center font-extrabold tracking-wide leading-normal md:text-5xl xl:text-6xl dark:text-white gradient-text"> 
+                    <h1 className="text-6xl text-center font-extrabold tracking-wider leading-normal md:text-5xl xl:text-6xl dark:text-white gradient-text"> 
                         Let Us<span className='text-teal-500'> Optimize </span> Your Routes
                     </h1>
-                    <p className="mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400 text-center">Less Driving = Save Gas. Save Time.</p>
+                    <p className="mb-3 font-light lg:mb-4 text-sm md:text-lg text-gray-400 text-center">Less Driving = Save Gas. Save Time.</p>
                     
                     <div className="w-full">
                         <form className="flex flex-col max-w-sm mt-10 m-auto" onSubmit={handleSubmit}>
@@ -95,7 +92,7 @@ const HeroSection = () => {
                             <FontAwesomeIcon icon={faCirclePlus} /> Add Another Stop
                         </button>
 
-                        <button className ="text-white bg-gradient-to-l from-teal-400 font-medium rounded-lg text-sm px-5 py-2.5 mt-8 text-center tracking-wide">
+                        <button className ="text-white bg-gradient-to-l from-teal-400 hover:bg-gradient-to-r font-medium rounded-lg text-sm px-5 py-2.5 mt-8 text-center tracking-wide optimize">
                             Optimize Route  
                             <FontAwesomeIcon icon={faLocationArrow} /> 
                         </button>
@@ -103,10 +100,6 @@ const HeroSection = () => {
                     </form>
                     </div>
                 </div>
-
-                {/* <div className="hidden lg:mt-0 lg:col-span-5 lg:flex rotate-12 opacity-80">
-                    <img src= {heroImage} alt="mockup" className='h-max'/>
-                </div>                 */}
             </div>
         </section>
      );
