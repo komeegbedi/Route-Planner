@@ -12,7 +12,7 @@ const Navbar = () => {
                 </Link>
                 
                 <div className="hidden w-full md:block md:w-auto" id="navbar-default">
-                    <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0">
+                    <ul className="font-normal tracking-normal flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0">
                         <li>
                             <Link to="/About" className="block py-2 px-3 text-white">About</Link>
                         </li>

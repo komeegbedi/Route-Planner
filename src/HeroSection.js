@@ -48,19 +48,18 @@ const HeroSection = () => {
 
     
     return ( 
-        <section className="bg-center bg-no-repeat bg-[url('./images/vecteezy_route-icon-between-two-points-with-dotted-path-and-location-pin_22188254.png')] bg-blend-multiply bg-contain h-screen place-items-center">
-            <div className="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 h-4/5">
-                <div className="mr-auto place-self-center lg:col-span-7">
-                    <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-normal leading-normal md:text-5xl xl:text-6xl dark:text-white"> 
-                        Let Us 
-                        <span className='text-teal-500'> Optimize</span> 
-                        Your Routes
+        <section className="h-screen  bg-center bg-no-repeat bg-[url('./images/vecteezy_route-icon-between-two-points-with-dotted-path-and-location-pin_22188254.png')] bg-blend-multiply bg-contain">
+            <div className="flex flex-col justify-center items-center max-w-screen-xl px-4 py-8 mx-auto lg:py-16 h-4/5">
+                <div className="w-full">
+                    <h1 className="mb-4 text-4xl text-center font-extrabold tracking-wide leading-normal md:text-5xl xl:text-6xl dark:text-white gradient-text"> 
+                        Let Us<span className='text-teal-500'> Optimize </span> Your Routes
                     </h1>
-                    <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">Less Driving = Save Gas. Save Time.</p>
+                    <p className="mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400 text-center">Less Driving = Save Gas. Save Time.</p>
                     
-                    <form className="max-w-sm mt-8">
+                    <div className="w-full">
+                        <form className="flex flex-col max-w-sm mt-10 m-auto">
 
-                        {/* Renders the input field to the page*/}
+                        {/* ------------ Renders the input field to the page ------------ */}
                         {inputFields.map((input, index) => (
 
                             <div key={index} className='flex mt-5'>
@@ -76,6 +75,7 @@ const HeroSection = () => {
                                     </AddressAutofill>
                                 </div>
 
+                                 {/* ------- Show Delete Button Only if the input fields are more than 2----------*/}
                                  {inputFields.length > 2 && (
                                     <button onClick={event => handleDeleteField(index, event)} className='flex-none ml-2'>
                                         <FontAwesomeIcon icon={faTrash} />
@@ -88,20 +88,21 @@ const HeroSection = () => {
                             <FontAwesomeIcon icon={faCirclePlus} /> Add Another Stop
                         </button>
 
-                        <button className ="text-white bg-gradient-to-l from-teal-400 font-medium rounded-lg text-sm px-5 py-2.5 mt-8 text-center">
-                            Optimize Route 
+                        <button className ="text-white bg-gradient-to-l from-teal-400 font-medium rounded-lg text-sm px-5 py-2.5 mt-8 text-center tracking-wide">
+                            Optimize Route  
                             <FontAwesomeIcon icon={faLocationArrow} /> 
                         </button>
                    
                     </form>
+                    </div>
                 </div>
 
-                <div className="hidden lg:mt-0 lg:col-span-5 lg:flex rotate-12 opacity-80">
+                {/* <div className="hidden lg:mt-0 lg:col-span-5 lg:flex rotate-12 opacity-80">
                     <img src= {heroImage} alt="mockup" className='h-max'/>
-                </div>                
+                </div>                 */}
             </div>
         </section>
      );
-}
+}//HeroSection{}
  
 export default HeroSection;
