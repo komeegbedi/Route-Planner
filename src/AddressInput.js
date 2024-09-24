@@ -1,11 +1,12 @@
 import { AddressAutofill } from '@mapbox/search-js-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import processFormData from './processData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const AddressInput = () =>{
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+    const [location, setLocation] = useState({ longitude: null, latitude: null });
 
     //Dynamically add an Input field when the "Add Another Stop" button is clicked 
 
@@ -47,6 +48,59 @@ const AddressInput = () =>{
         processFormData(inputFields);
     };
 
+    const handleSuggestionSelect = (suggestion, index) => {
+        console.log(suggestion);
+        // const { place_name, context } = suggestion.features;  // Get the full place object
+       
+    
+        // let city = "";
+        // let country = "";
+        // let postalCode = "";
+    
+        // // Extract the required details (city, country, postal code) from the context
+        // context.forEach((component) => {
+        //     if (component.id.includes('place')) {
+        //         city = component.text;  // Extract city name
+        //     }
+        //     if (component.id.includes('country')) {
+        //         country = component.text;  // Extract country name
+        //     }
+        //     if (component.id.includes('postcode')) {
+        //         postalCode = component.text;  // Extract postal code
+        //     }
+        // });
+    
+        // console.log(`Address: ${place_name}`);
+        // console.log(`City: ${city}`);
+        // console.log(`Country: ${country}`);
+        // console.log(`Postal Code: ${postalCode}`);
+    
+        // // Update the specific input field with full address details
+        // const updatedFields = [...inputFields];
+        // updatedFields[index] = {
+        //     ...updatedFields[index],
+        //     value: place_name,  // Set the address
+        //     city,               // Add city
+        //     country,            // Add country
+        //     postalCode          // Add postal code
+        // };
+        // setInputFields(updatedFields);  // Update state
+    };
+
+    useEffect(()=>{
+        navigator.geolocation.getCurrentPosition((
+            position) =>{
+                // console.log(position.coords.latitude);
+                // console.log(position.coords.longitude);
+                const {longitude , latitude} = position.coords;
+                setLocation({ longitude , latitude });
+        },
+        (error) => {
+          console.error("Error fetching location:", error);
+        })
+    }, []);
+    
+
     return(
         <form className="flex flex-col max-w-sm mt-10 m-auto" onSubmit={handleSubmit}>
 
@@ -55,9 +109,20 @@ const AddressInput = () =>{
 
                 <div key={index} className='flex mt-5'>
                     <div className="flex-grow">
-                        <AddressAutofill accessToken= {MAPBOX_ACCESS_TOKEN}>
+                    {/*----------------- 
+                        The AddressAutofill which abstracts away the need to manually handle HTTP requests. 
+                        This component automatically sends the necessary requests to the Mapbox Geocoding API behind the scenes when users type into the input field. 
+                        It takes care of making the necessary API calls  
+                    -------------------*/}
+                        <AddressAutofill 
+                            accessToken= {MAPBOX_ACCESS_TOKEN}
+                            onRetrieve={(suggestion) => handleSuggestionSelect(suggestion, index)}  // Capture full response when suggestion is selected
+                            options={{
+                                proximity: `${location.longitude}, ${location.latitude}`
+                            }}
+                        >
                             <input
-                                type="text"
+                                type="address"
                                 value={input.value}
                                 onChange={event => handleInputChange(index, event)}
                                 name={"address-"+index} autoComplete={"address-line-"+index}
