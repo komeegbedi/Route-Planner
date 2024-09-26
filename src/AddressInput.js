@@ -5,8 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const AddressInput = () =>{
-    const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
     const [location, setLocation] = useState({ longitude: null, latitude: null });
+    const [mapboxToken, setMapboxToken] = useState('');
 
     //Dynamically add an Input field when the "Add Another Stop" button is clicked 
 
@@ -59,7 +59,6 @@ const AddressInput = () =>{
         let city = "";
         let country = "";
         let postalCode = "";
-        let countryShortCode ="";
     
         // Extract the required details (city, country, postal code) from the context
         context.forEach((component) => {
@@ -68,7 +67,6 @@ const AddressInput = () =>{
             }
             if (component.id.includes('country')) {
                 country = component.text_en;  // Extract country name
-                countryShortCode = component.short_code;
             }
             if (component.id.includes('postcode')) {
                 postalCode = component.text_en;  // Extract postal code
@@ -110,6 +108,14 @@ const AddressInput = () =>{
     };
 
     useEffect(()=>{
+        // Fetch the token from the backend
+        fetch('http://localhost:8000/mapbox-token')
+        .then(response => response.json())
+        .then(data => {
+            setMapboxToken(data.token);
+        })
+        .catch(error => console.error('Error fetching token:', error));
+
         navigator.geolocation.getCurrentPosition((
             position) =>{
                 // console.log(position.coords.latitude);
@@ -123,6 +129,7 @@ const AddressInput = () =>{
         
     }, []);
     
+    if (!mapboxToken) return null;  // Wait for the token to be loaded
 
     return(
         <form className="flex flex-col max-w-sm mt-10 m-auto" onSubmit={handleSubmit}>
@@ -138,7 +145,7 @@ const AddressInput = () =>{
                         It takes care of making the necessary API calls  
                     -------------------*/}
                         <AddressAutofill 
-                            accessToken= {MAPBOX_ACCESS_TOKEN}
+                            accessToken= {mapboxToken}
                             onRetrieve={(suggestion) => handleSuggestionSelect(suggestion, index)}  // Capture full response when suggestion is selected
                             options={
                                 location.longitude && location.latitude ? {

@@ -1,5 +1,5 @@
 // Probably do this in Node JS
-const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN;
 const BASE_URL = 'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
 
 async function ProcessData(data) {
