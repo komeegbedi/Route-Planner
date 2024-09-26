@@ -1,6 +1,6 @@
 import { AddressAutofill } from '@mapbox/search-js-react';
 import React, { useEffect, useState } from 'react';
-import ProcessFormData from './ProcessData';
+import ProcessFormData from './processData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 
