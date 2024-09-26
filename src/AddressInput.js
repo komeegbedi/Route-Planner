@@ -1,6 +1,6 @@
 import { AddressAutofill } from '@mapbox/search-js-react';
 import React, { useEffect, useState } from 'react';
-import processFormData from './processData';
+import ProcessFormData from './ProcessData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,6 +13,11 @@ const AddressInput = () =>{
     // The inputFields state is initialized as an array with one object that represents the first input field.
     // Each object has a 'value' key that will store the content of the input field.
     const [inputFields, setInputFields] = useState([{ value: '' }, { value: '' }]);
+    
+    //TODO: think of a better name for this array
+    const [finalInputFields, setFinalInputFileds] = useState([...inputFields]);
+
+   
 
     // handleAddField is a function that adds a new input field.
     // It updates the state by spreading the current inputFields array and adding a new object with an empty value.
@@ -42,49 +47,66 @@ const AddressInput = () =>{
         }
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        processFormData(inputFields);
-    };
-
     const handleSuggestionSelect = (suggestion, index) => {
-        console.log(suggestion);
-        // const { place_name, context } = suggestion.features;  // Get the full place object
+        
+        // console.log(suggestion.features[0].properties);
+        // console.log(index);
+        const features = suggestion.features[0];
+        const { place_name, context } = features.properties;  // Get the full place object
+        const [longitude, latitude] = features.geometry.coordinates;
+    
        
+        let city = "";
+        let country = "";
+        let postalCode = "";
+        let countryShortCode ="";
     
-        // let city = "";
-        // let country = "";
-        // let postalCode = "";
-    
-        // // Extract the required details (city, country, postal code) from the context
-        // context.forEach((component) => {
-        //     if (component.id.includes('place')) {
-        //         city = component.text;  // Extract city name
-        //     }
-        //     if (component.id.includes('country')) {
-        //         country = component.text;  // Extract country name
-        //     }
-        //     if (component.id.includes('postcode')) {
-        //         postalCode = component.text;  // Extract postal code
-        //     }
-        // });
+        // Extract the required details (city, country, postal code) from the context
+        context.forEach((component) => {
+            if (component.id.includes('place')) {
+                city = component.text_en;  // Extract city name
+            }
+            if (component.id.includes('country')) {
+                country = component.text_en;  // Extract country name
+                countryShortCode = component.short_code;
+            }
+            if (component.id.includes('postcode')) {
+                postalCode = component.text_en;  // Extract postal code
+            }
+        });
     
         // console.log(`Address: ${place_name}`);
         // console.log(`City: ${city}`);
         // console.log(`Country: ${country}`);
         // console.log(`Postal Code: ${postalCode}`);
     
-        // // Update the specific input field with full address details
-        // const updatedFields = [...inputFields];
-        // updatedFields[index] = {
-        //     ...updatedFields[index],
-        //     value: place_name,  // Set the address
-        //     city,               // Add city
-        //     country,            // Add country
-        //     postalCode          // Add postal code
-        // };
-        // setInputFields(updatedFields);  // Update state
+        // Update the specific input field with full address details
+        const updatedFields = [...finalInputFields];
+        updatedFields[index] = {
+            ...updatedFields[index],
+            value: place_name,  
+            city,              
+            country,            
+            postalCode,          
+            longitude,
+            latitude
+        };
+        
+        setFinalInputFileds(updatedFields);  // Update state
+    };
+
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // TODO: this is dependent on the user clicking the suggestion box, what if the user doesn't click it
+        // check that the number of inputFields === finalInputFields
+        ProcessFormData(finalInputFields); 
+    };
+
+    const geoLocationOptions = {
+        enableHighAccuracy: true, // More precise but may take longer and use more battery
+        timeout: 5000,            // Maximum time allowed to get location
+        maximumAge: 0             // No cached location data
     };
 
     useEffect(()=>{
@@ -97,7 +119,8 @@ const AddressInput = () =>{
         },
         (error) => {
           console.error("Error fetching location:", error);
-        })
+        }, geoLocationOptions)
+        
     }, []);
     
 
@@ -117,10 +140,12 @@ const AddressInput = () =>{
                         <AddressAutofill 
                             accessToken= {MAPBOX_ACCESS_TOKEN}
                             onRetrieve={(suggestion) => handleSuggestionSelect(suggestion, index)}  // Capture full response when suggestion is selected
-                            options={{
-                                proximity: `${location.longitude}, ${location.latitude}`
-                            }}
-                        >
+                            options={
+                                location.longitude && location.latitude ? {
+                                    proximity: `${location.longitude}, ${location.latitude}`
+                                 }:{ /* no proximity, Mapbox will rank suggestions based on the user’s IP-based location approximation */}
+                            }
+                        > 
                             <input
                                 type="address"
                                 value={input.value}
