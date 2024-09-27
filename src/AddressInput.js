@@ -109,7 +109,7 @@ const AddressInput = () =>{
 
     useEffect(()=>{
         // Fetch the token from the backend
-        fetch('http://localhost:8000/mapbox-token')
+        fetch('/api/mapbox-token')
         .then(response => response.json())
         .then(data => {
             setMapboxToken(data.token);
