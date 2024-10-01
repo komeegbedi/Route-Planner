@@ -113,7 +113,7 @@ const AddressInput = () =>{
         };
 
         // Fetch the token from the backend
-        fetch('/mapbox-token') //TODO: update for vercel 
+        fetch('/api/mapbox-token') //TODO: update for vercel 
         .then(response => response.json())
         .then(data => {
             setMapboxToken(data.token);

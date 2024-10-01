@@ -3,7 +3,7 @@ const BASE_URL = 'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
 
 async function fetchMapboxToken() {
     try {
-        const response = await fetch('mapbox-token'); //TODO: update for vercel 
+        const response = await fetch('/api/mapbox-token'); //TODO: update for vercel 
         if (!response.ok) {
             throw new Error(`Error fetching token: ${response.status} - ${response.statusText}`);
         }

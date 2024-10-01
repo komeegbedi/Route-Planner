@@ -1,4 +1,5 @@
-import HeroSection from "./HeroSection";
+import HeroSection from "../src/components/HeroSection";
+
 const Home = () => {
     return (  
         <div className="relative min-h-screen bg-map bg-fade text-white items-center p-10">

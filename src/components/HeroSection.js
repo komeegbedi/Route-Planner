@@ -1,7 +1,10 @@
 //This file handles the design of the hero section
 
-import './App.css';
-import AddressInput from './AddressInput';
+// import '';
+// import AddressInput from '../AddressInput';
+
+import dynamic from 'next/dynamic';
+const AddressInput = dynamic(() => import('../AddressInput'), { ssr: false });
 
 const HeroSection = () => {
     return ( 
