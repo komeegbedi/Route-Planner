@@ -98,6 +98,7 @@ const AddressInput = () =>{
         e.preventDefault();
         // TODO: this is dependent on the user clicking the suggestion box, what if the user doesn't click it
         // check that the number of inputFields === finalInputFields
+        // TODO: Form Validation (Addresses are valid, check that Form is not empty, Sanitize inputs etc)
         ProcessFormData(finalInputFields); 
     };
 
@@ -109,7 +110,7 @@ const AddressInput = () =>{
 
     useEffect(()=>{
         // Fetch the token from the backend
-        fetch('/api/mapbox-token')
+        fetch('/mapbox-token') //TODO: update for vercel 
         .then(response => response.json())
         .then(data => {
             setMapboxToken(data.token);
@@ -159,6 +160,7 @@ const AddressInput = () =>{
                                 onChange={event => handleInputChange(index, event)}
                                 name={"address-"+index} autoComplete={"address-line-"+index}
                                 className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg w-full focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:border-gray-600 placeholder-gray-600" placeholder="Enter Stop Address"
+                                required
                             />
                         </AddressAutofill>
                     </div>

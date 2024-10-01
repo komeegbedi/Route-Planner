@@ -1,5 +1,4 @@
 export default function handler(req, res) {
-    // Assuming you have your Mapbox access token stored in an environment variable
     const mapboxToken = process.env.MAPBOX_ACCESS_TOKEN;
     
     if (!mapboxToken) {
