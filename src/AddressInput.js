@@ -102,13 +102,16 @@ const AddressInput = () =>{
         ProcessFormData(finalInputFields); 
     };
 
-    const geoLocationOptions = {
-        enableHighAccuracy: true, // More precise but may take longer and use more battery
-        timeout: 5000,            // Maximum time allowed to get location
-        maximumAge: 0             // No cached location data
-    };
+    
 
     useEffect(()=>{
+        
+        const geoLocationOptions = {
+            enableHighAccuracy: true, // More precise but may take longer and use more battery
+            timeout: 5000,            // Maximum time allowed to get location
+            maximumAge: 0             // No cached location data
+        };
+
         // Fetch the token from the backend
         fetch('/mapbox-token') //TODO: update for vercel 
         .then(response => response.json())
