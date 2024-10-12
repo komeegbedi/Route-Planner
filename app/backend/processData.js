@@ -1,6 +1,20 @@
 // Probably do this in Node JS
-const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN;
 const BASE_URL = 'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
+
+async function fetchMapboxToken() {
+    try {
+        const response = await fetch('/api/mapbox');
+        if (!response.ok) {
+            throw new Error(`Error fetching token: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.token; 
+    } catch (error) {
+        console.error('Failed to fetch the Mapbox token:', error);
+        return null;
+    }
+}//fetchMapboxToken()
 
 async function ProcessData(data) {
     if (data.length < 2) {
@@ -8,9 +22,15 @@ async function ProcessData(data) {
         return;
     }
 
+    const mapboxToken = await fetchMapboxToken();
+    if (!mapboxToken) {
+        console.error('Mapbox token could not be retrieved.');
+        return;
+    }
+
     // Constructing the coordinates string
     const coordinates = data.map(entry => `${entry.longitude},${entry.latitude}`).join(';');
-    const url = `${BASE_URL}/${coordinates}?annotations=distance,duration&access_token=${MAPBOX_ACCESS_TOKEN}`;
+    const url = `${BASE_URL}/${coordinates}?annotations=distance,duration&access_token=${mapboxToken}`;
 
     try {
         const response = await fetch(url);
@@ -23,12 +43,12 @@ async function ProcessData(data) {
     } catch (error) {
         console.error('Failed to fetch directions:', error);
     }
-}
+} // ProcessData()
 
 function processDirections(directions) {
     // Implement your data processing logic here
     console.log('Processing directions:', directions);
     // You can extract specific data or perform calculations
-}
+}//processDirections()
 
 export default ProcessData;

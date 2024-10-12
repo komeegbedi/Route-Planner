@@ -1,7 +1,8 @@
 //This file handles the design of the hero section
 
-import './App.css';
+// import '';
 import AddressInput from './AddressInput';
+
 
 const HeroSection = () => {
     return ( 
