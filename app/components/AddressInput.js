@@ -1,6 +1,7 @@
+'use client';
 import { AddressAutofill } from '@mapbox/search-js-react';
-import React, { useEffect, useState } from 'react';
-import ProcessFormData from './processData';
+import { useEffect, useState } from 'react';
+import ProcessFormData from '../backend/processData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -113,12 +114,18 @@ const AddressInput = () =>{
         };
 
         // Fetch the token from the backend
-        fetch('/api/mapbox-token') //TODO: update for vercel 
-        .then(response => response.json())
-        .then(data => {
-            setMapboxToken(data.token);
-        })
-        .catch(error => console.error('Error fetching token:', error));
+       async function fetchMapboxToken() {
+            try{
+                const response = await fetch('/api/mapbox');
+                if (!response.ok) {
+                  throw new Error('Failed to fetch Mapbox token');
+                }
+                const data = await response.json();
+                setMapboxToken(data.token);
+            }catch (err) {
+                console.log(err.message);
+            }
+       }
 
         navigator.geolocation.getCurrentPosition((
             position) =>{
@@ -131,6 +138,7 @@ const AddressInput = () =>{
           console.error("Error fetching location:", error);
         }, geoLocationOptions)
         
+        fetchMapboxToken();
     }, []);
     
     if (!mapboxToken) return null;  // Wait for the token to be loaded
