@@ -4,9 +4,10 @@ const nextConfig = {
     env: {
       MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
     },
-    // Uncomment the following if you need to use Mapbox in a Client Component
+    transpilePackages: ['@mapbox/search-js-react'],
+    // Uncomment if you need to use Mapbox in a Client Component and encounter issues
     // experimental: {
-    //   esmExternals: false,
+    //   esmExternals: 'loose',
     // },
   }
   

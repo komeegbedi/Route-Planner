@@ -1,9 +1,14 @@
 'use client';
-import { AddressAutofill } from '@mapbox/search-js-react';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import ProcessFormData from '../backend/processData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
+
+const DynamicAddressAutofill = dynamic(
+    () => import('@mapbox/search-js-react').then((mod) => mod.AddressAutofill),
+    { ssr: false }
+);
 
 const AddressInput = () =>{
     const [location, setLocation] = useState({ longitude: null, latitude: null });
@@ -156,7 +161,7 @@ const AddressInput = () =>{
                         This component automatically sends the necessary requests to the Mapbox Geocoding API behind the scenes when users type into the input field. 
                         It takes care of making the necessary API calls  
                     -------------------*/}
-                        <AddressAutofill 
+                        <DynamicAddressAutofill 
                             accessToken= {mapboxToken}
                             onRetrieve={(suggestion) => handleSuggestionSelect(suggestion, index)}  // Capture full response when suggestion is selected
                             options={
@@ -173,7 +178,7 @@ const AddressInput = () =>{
                                 className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg w-full focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:border-gray-600 placeholder-gray-600" placeholder="Enter Stop Address"
                                 required
                             />
-                        </AddressAutofill>
+                        </DynamicAddressAutofill>
                     </div>
 
                         {/* ------- Show Delete Button Only if the input fields are more than 2----------*/}
