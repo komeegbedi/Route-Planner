@@ -1,7 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import ProcessFormData from '../backend/processData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,6 +12,9 @@ const DynamicAddressAutofill = dynamic(
 const AddressInput = () =>{
     const [location, setLocation] = useState({ longitude: null, latitude: null });
     const [mapboxToken, setMapboxToken] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [processedData, setProcessedData] = useState(null);
+    
 
     //Dynamically add an Input field when the "Add Another Stop" button is clicked 
 
@@ -100,18 +102,17 @@ const AddressInput = () =>{
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         // TODO: this is dependent on the user clicking the suggestion box, what if the user doesn't click it
         // check that the number of inputFields === finalInputFields
         // TODO: Form Validation (Addresses are valid, check that Form is not empty, Sanitize inputs etc)
-        ProcessFormData(finalInputFields); 
+        // ProcessFormData(finalInputFields); 
+        setIsSubmitting(true);
     };
 
     
-
     useEffect(()=>{
-        
         const geoLocationOptions = {
             enableHighAccuracy: true, // More precise but may take longer and use more battery
             timeout: 5000,            // Maximum time allowed to get location
@@ -119,7 +120,7 @@ const AddressInput = () =>{
         };
 
         // Fetch the token from the backend
-       async function fetchMapboxToken() {
+        const fetchMapboxToken = async () => {
             try{
                 const response = await fetch('/api/mapbox');
                 if (!response.ok) {
@@ -131,7 +132,6 @@ const AddressInput = () =>{
                 console.log(err.message);
             }
        }
-
         navigator.geolocation.getCurrentPosition((
             position) =>{
                 // console.log(position.coords.latitude);
@@ -145,6 +145,40 @@ const AddressInput = () =>{
         
         fetchMapboxToken();
     }, []);
+
+
+    //Runs after the form is submitted 
+    useEffect(() => {
+        const processAddresses = async () => {
+          if (isSubmitting) {
+           
+            try {
+                const response = await fetch('/api/process-addresses', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(finalInputFields),
+                });
+    
+                const data = await response.json();
+                setProcessedData(data.result);
+                console.log('Processed', data.result);
+    
+              } 
+            catch (error) {
+                console.error('Error processing addresses:', error);
+            } 
+            finally {
+              setIsSubmitting(false);
+            //   console.log('Processed data:', processedData);
+            }
+          }
+        };
+        
+        processAddresses();
+      }, [isSubmitting, processedData]);
+
     
     if (!mapboxToken) return null;  // Wait for the token to be loaded
 
