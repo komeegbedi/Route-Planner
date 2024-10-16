@@ -7,6 +7,7 @@ export async function ProcessData(data) {
         console.error('At least two entries are required for directions.');
         return;
     }
+    //TODO: Make sure to check that the addresses are not more than 20
 
     // Constructing the coordinates string
     const coordinates = data.map(entry => `${entry.longitude},${entry.latitude}`).join(';');
@@ -19,14 +20,13 @@ export async function ProcessData(data) {
         }
         
         const result = await response.json();
-        const returnData = processDirections(result, data);
-       console.log("Return Data"+ returnData);
+        const routeOptimizationResults = optimizeRouteWithNearestNeighbor(result, data);
        
         return{
-            processedAddresses: returnData[0].map(address => `${address}`),
-            optimizedTimeDuration: returnData[1],
-            unOptimizedTime: returnData[2],
-            timeSaved: returnData[3],
+            processedAddresses: routeOptimizationResults[0].map(address => `${address}`),
+            optimizedTimeDuration: routeOptimizationResults[1],
+            unOptimizedTime: routeOptimizationResults[2],
+            timeSaved: routeOptimizationResults[3],
         }
 
     } 
@@ -36,11 +36,18 @@ export async function ProcessData(data) {
 
 } // ProcessData()
 
-// Nearest neighbor heuristic 
-const processDirections = (directions, address) => {
+/*
+    * This function implements the Nearest neighbor heuristic -> Start from the starting point (the first address). 
+        Find the vertex that is closest (more precisely, has the minimum distance) to the current position 
+        but is not yet part of the route, and add it into the route. Repeat until the route includes each vertex.
+
+    * Returns an array containing the optimized path (array), the time duration of the optimized path, 
+        the time duration of the un optimized path and the total time saved 
+*/
+const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
     // console.log(directions);
 
-    let isVisited = Array(directions.durations.length).fill(false); // boolean array to keep track of visited locations.
+    let isVisited = Array(routeMetrics.durations.length).fill(false); // boolean array to keep track of visited locations.
     let orderOfVisit = []; //array to store the path
     let optimizedTimeDuration = 0; //  total time duration of the path.
     let currentLocation = 0; // Set the current location as the starting point.
@@ -55,11 +62,11 @@ const processDirections = (directions, address) => {
 
         // Look at the row in the matrix corresponding to the current location.
         // Find the minimum time duration among unvisited locations, excluding the final destination.
-        for(let i = 0; i < directions.durations.length - 1; i++ ){
+        for(let i = 0; i < routeMetrics.durations.length - 1; i++ ){
            
-            if(directions.durations[currentLocation][i] !== 0 && !isVisited[i] && directions.durations[currentLocation][i] < currentMinimumDistance){
+            if(routeMetrics.durations[currentLocation][i] !== 0 && !isVisited[i] && routeMetrics.durations[currentLocation][i] < currentMinimumDistance){
                 indexOfMinimumDistance = i;
-                currentMinimumDistance = directions.durations[currentLocation][i];
+                currentMinimumDistance = routeMetrics.durations[currentLocation][i];
             }
         }
 
@@ -71,36 +78,37 @@ const processDirections = (directions, address) => {
     }//while()
 
     // Add the final destination (last index) to the path.
-    orderOfVisit[orderOfVisit.length] = directions.durations.length-1;
-    isVisited[directions.durations.length - 1] = true;
-    optimizedTimeDuration += directions.durations[currentLocation][directions.durations.length - 1];
+    orderOfVisit[orderOfVisit.length] = routeMetrics.durations.length-1;
+    isVisited[routeMetrics.durations.length - 1] = true;
+    optimizedTimeDuration += routeMetrics.durations[currentLocation][routeMetrics.durations.length - 1];
 
+    // ===================== START DEBUG =====================
     // console.log(isVisited);
     // console.log('Processing directions:', directions);
-
    console.log(orderOfVisit);
+   //===================== END DEBUG =====================
 
    // order of visit 
-   let returnData = [];
-   returnData[0] = [];
+   let routeOptimizationResults = [];
+   routeOptimizationResults[0] = [];
    orderOfVisit.map((element, index) => {
         // console.log(address[element].value);
-        returnData[0][index] = address[element].value;
+        routeOptimizationResults[0][index] = address[element].value;
    })
    
   
-   const unOptimizedTime = directions.durations[0].reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+   const unOptimizedTime = routeMetrics.durations[0].reduce((accumulator, currentValue) => accumulator + currentValue, 0);
    const timeSaved = unOptimizedTime - optimizedTimeDuration;
-   returnData[1] = Math.ceil(optimizedTimeDuration/60);
-   returnData[2] = Math.ceil(unOptimizedTime/60);
-   returnData[3] = Math.ceil(timeSaved/60);
+   routeOptimizationResults[1] = Math.ceil(optimizedTimeDuration/60);
+   routeOptimizationResults[2] = Math.ceil(unOptimizedTime/60);
+   routeOptimizationResults[3] = Math.ceil(timeSaved/60);
 
-   //START DEBUG
+   //===================== START DEBUG =====================
    console.log("Optimized duration: "+ Math.ceil(optimizedTimeDuration/60));
    console.log("Unoptimized duration: "+ Math.ceil(unOptimizedTime/60));
    console.log("Time Saved: "+ Math.ceil(timeSaved/60));
    //console.log(listOfAddressInOrder);
-  // END DEBUG
+  // ===================== END DEBUG =====================
 
-   return returnData;
+   return routeOptimizationResults;
 }//processDirections()

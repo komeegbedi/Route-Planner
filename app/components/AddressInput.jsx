@@ -12,8 +12,8 @@ const DynamicAddressAutofill = dynamic(
 const AddressInput = () =>{
     const [location, setLocation] = useState({ longitude: null, latitude: null });
     const [mapboxToken, setMapboxToken] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [processedData, setProcessedData] = useState(null);
+    // const [isSubmitting, setIsSubmitting] = useState(false);
     
 
     //Dynamically add an Input field when the "Add Another Stop" button is clicked 
@@ -108,7 +108,32 @@ const AddressInput = () =>{
         // check that the number of inputFields === finalInputFields
         // TODO: Form Validation (Addresses are valid, check that Form is not empty, Sanitize inputs etc)
         // ProcessFormData(finalInputFields); 
-        setIsSubmitting(true);
+        // setIsSubmitting(true);
+        await processAddresses();
+        console.log(processedData);
+       
+    };
+
+    const processAddresses = async () => {
+       
+       
+        try {
+            const response = await fetch('/api/process-addresses', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(finalInputFields),
+            });
+
+            const data = await response.json();
+            setProcessedData(data.result);
+            console.log('Processed', data.result);
+
+        } 
+        catch (error) {
+            console.error('Error processing addresses:', error);
+        } 
     };
 
     
@@ -132,6 +157,7 @@ const AddressInput = () =>{
                 console.log(err.message);
             }
        }
+
         navigator.geolocation.getCurrentPosition((
             position) =>{
                 // console.log(position.coords.latitude);
@@ -146,38 +172,36 @@ const AddressInput = () =>{
         fetchMapboxToken();
     }, []);
 
-
-    //Runs after the form is submitted 
-    useEffect(() => {
-        const processAddresses = async () => {
-          if (isSubmitting) {
-           
-            try {
-                const response = await fetch('/api/process-addresses', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(finalInputFields),
-                });
-    
-                const data = await response.json();
-                setProcessedData(data.result);
-                console.log('Processed', data.result);
-    
-              } 
-            catch (error) {
-                console.error('Error processing addresses:', error);
-            } 
-            finally {
-              setIsSubmitting(false);
-            //   console.log('Processed data:', processedData);
-            }
-          }
-        };
+    // useEffect(() => {
+    //     const processAddresses = async () => {
+       
+    //        if(isSubmitting){
+    //             try {
+    //                 const response = await fetch('/api/process-addresses', {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //                 body: JSON.stringify(finalInputFields),
+    //                 });
         
-        processAddresses();
-      }, [isSubmitting, processedData]);
+    //                 const data = await response.json();
+    //                 setProcessedData(data.result);
+    //                 console.log('Processed', data.result);
+        
+    //             } 
+    //             catch (error) {
+    //                 console.error('Error processing addresses:', error);
+    //             } 
+    //             finally{
+    //                 setIsSubmitting(false);
+    //             }
+    //        }
+        
+    //     };
+
+    //     processAddresses();
+    // }, [isSubmitting])
 
     
     if (!mapboxToken) return null;  // Wait for the token to be loaded
@@ -215,8 +239,8 @@ const AddressInput = () =>{
                         </DynamicAddressAutofill>
                     </div>
 
-                        {/* ------- Show Delete Button Only if the input fields are more than 2----------*/}
-                        {inputFields.length > 2 && (
+                    {/* ------- Show Delete Button Only if the input fields are more than 2----------*/}
+                    {inputFields.length > 2 && (
                         <button onClick={event => handleDeleteField(index, event)} className='flex-none ml-2'>
                             <FontAwesomeIcon icon={faTrash} />
                         </button>
