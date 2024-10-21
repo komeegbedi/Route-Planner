@@ -85,6 +85,7 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
 
     // Apply the 2-opt local search algorithm to find a more optimal route by swapping edges
     // in the current path and checking for improvements.
+   
     let twoOptResult = localSearchWithTwoOpt(orderOfVisit, optimizedTimeDuration , routeMetrics);
     orderOfVisit = twoOptResult[0];
     optimizedTimeDuration = twoOptResult[1];
@@ -170,8 +171,8 @@ const localSearchWithTwoOpt = (nearestNeighbourSolution, nearestNeighbourCost, r
                 let newPath = [...nearestNeighbourSolution.slice(0, i+1), ... reservedSubArray , ...nearestNeighbourSolution.slice(j)];
                 let pathCost = costOfPath(newPath, routeMetrics);
 
-                //Ignore micro improvements (1 second or less)
-                if(pathCost < bestImprovementCost && (bestImprovement - pathCost) > MIN_IMPROVEMENT + epsilon){
+                //TODO: Ignore micro improvements (1 second or less)
+                if(pathCost < bestImprovementCost){
                     improvementFound = true; 
                     bestImprovement = newPath;
                     noImprovementCounter = 0;
