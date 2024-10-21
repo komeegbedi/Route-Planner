@@ -55,8 +55,6 @@ const AddressInput = () =>{
 
     const handleSuggestionSelect = (suggestion, index) => {
         
-        // console.log(suggestion.features[0].properties);
-        // console.log(index);
         const features = suggestion.features[0];
         const { place_name, context } = features.properties;  // Get the full place object
         const [longitude, latitude] = features.geometry.coordinates;
@@ -79,10 +77,6 @@ const AddressInput = () =>{
             }
         });
     
-        // console.log(`Address: ${place_name}`);
-        // console.log(`City: ${city}`);
-        // console.log(`Country: ${country}`);
-        // console.log(`Postal Code: ${postalCode}`);
     
         // Update the specific input field with full address details
         const updatedFields = [...finalInputFields];
@@ -96,7 +90,7 @@ const AddressInput = () =>{
             latitude
         };
         
-        setFinalInputFileds(updatedFields);  // Update state
+        setFinalInputFileds(updatedFields); 
     };
 
     // Handle form submission
@@ -105,11 +99,7 @@ const AddressInput = () =>{
         // TODO: this is dependent on the user clicking the suggestion box, what if the user doesn't click it
         // check that the number of inputFields === finalInputFields
         // TODO: Form Validation (Addresses are valid, check that Form is not empty, Sanitize inputs etc)
-        // ProcessFormData(finalInputFields); 
-        // setIsSubmitting(true);
         await processAddresses();
-        console.log(processedData);
-       
     };
 
     const processAddresses = async () => {
@@ -129,7 +119,7 @@ const AddressInput = () =>{
 
             const data = await response.json();
             setProcessedData(data.result);
-            console.log('Processed', data.result);
+            console.log('Processed', data.result); //  PRINT: To console for now since frontend is not fully implemented yet
 
         } 
         catch (error) {
@@ -161,8 +151,6 @@ const AddressInput = () =>{
 
         navigator.geolocation.getCurrentPosition((
             position) =>{
-                // console.log(position.coords.latitude);
-                // console.log(position.coords.longitude);
                 const {longitude , latitude} = position.coords;
                 setLocation({ longitude , latitude });
         },

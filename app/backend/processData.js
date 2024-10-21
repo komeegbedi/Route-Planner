@@ -45,7 +45,6 @@ export async function ProcessData(data) {
         the time duration of the un optimized path and the total time saved 
 */
 const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
-    // console.log(directions);
 
     let isVisited = Array(routeMetrics.durations.length).fill(false); // boolean array to keep track of visited locations.
     let orderOfVisit = []; //array to store the path
@@ -77,43 +76,44 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
         isVisited[indexOfMinimumDistance] = true; //  Mark the nearest neighbor as visited.
     }//while()
 
-    // Add the final destination (last index) to the path.
+    // Add the final stop (last index) to the path array and mark as visited
     orderOfVisit[orderOfVisit.length] = routeMetrics.durations.length-1;
     isVisited[routeMetrics.durations.length - 1] = true;
+
+    // Add the time duration from the current location to the final stop
     optimizedTimeDuration += routeMetrics.durations[currentLocation][routeMetrics.durations.length - 1];
 
-    console.log("Before: "+ orderOfVisit);
+    // Apply the 2-opt local search algorithm to find a more optimal route by swapping edges
+    // in the current path and checking for improvements.
     let twoOptResult = localSearchWithTwoOpt(orderOfVisit, optimizedTimeDuration , routeMetrics);
     orderOfVisit = twoOptResult[0];
     optimizedTimeDuration = twoOptResult[1];
 
-    // ===================== START DEBUG =====================
-    // console.log(isVisited);
-    // console.log('Processing directions:', directions);
-   console.log("After: "+ orderOfVisit);
-   //===================== END DEBUG =====================
-
-   // order of visit 
+   
    let routeOptimizationResults = [];
    routeOptimizationResults[0] = [];
+
+    // Convert the indices in the path array to their corresponding human-readable addresses.
+    // For example: [0, 2, 4, 7] becomes ['91 Pembina Hwy', '72 King St', '97 Main St', '828 Silverstone']
    orderOfVisit.map((element, index) => {
-        // console.log(address[element].value);
         routeOptimizationResults[0][index] = address[element].value;
    })
    
   
    const unOptimizedTime = costOfPath(Array(orderOfVisit.length).fill(0).map((_, i) => i), routeMetrics);
    const timeSaved = unOptimizedTime - optimizedTimeDuration;
-   routeOptimizationResults[1] = Math.ceil(optimizedTimeDuration/60);
-   routeOptimizationResults[2] = Math.ceil(unOptimizedTime/60);
-   routeOptimizationResults[3] = Math.ceil(timeSaved/60);
 
-   //===================== START DEBUG =====================
-   console.log("Optimized duration: "+ Math.ceil(optimizedTimeDuration/60));
-   console.log("Unoptimized duration: "+ Math.ceil(unOptimizedTime/60));
-   console.log("Time Saved: "+ Math.ceil(timeSaved/60));
+   // These values are in seconds 
+   routeOptimizationResults[1] = optimizedTimeDuration;
+   routeOptimizationResults[2] = unOptimizedTime;
+   routeOptimizationResults[3] = timeSaved;
+
+   //===================== PRINT: To console for now since frontend is not fully implemented yet =====================
+   console.log(`Optimized duration: ${Math.floor(optimizedTimeDuration / 60)} minutes and ${(optimizedTimeDuration % 60).toFixed(2)} seconds`);
+   console.log(`Unoptimized duration: ${Math.floor(unOptimizedTime / 60)} minutes and ${(unOptimizedTime % 60).toFixed(2)} seconds`);
+   console.log(`Time Saved: ${Math.floor(timeSaved / 60)} minutes and ${(timeSaved % 60).toFixed(2)} seconds`);
    //console.log(listOfAddressInOrder);
-  // ===================== END DEBUG =====================
+  // ===================== END PRINT =====================
 
    return routeOptimizationResults;
 }//processDirections()
@@ -150,6 +150,7 @@ const localSearchWithTwoOpt = (nearestNeighbourSolution, nearestNeighbourCost, r
 
     const MAX_ITERATIONS = 100;
     const MIN_IMPROVEMENT = 1; //in seconds 
+    const epsilon = 1e-10; // Small tolerance value
     let noImprovementCounter = 0;
     let currentIterationNumber = 0;
     let bestImprovement = nearestNeighbourSolution;
@@ -169,16 +170,12 @@ const localSearchWithTwoOpt = (nearestNeighbourSolution, nearestNeighbourCost, r
                 let newPath = [...nearestNeighbourSolution.slice(0, i+1), ... reservedSubArray , ...nearestNeighbourSolution.slice(j)];
                 let pathCost = costOfPath(newPath, routeMetrics);
 
-                // console.log(newPath);
-                // console.log(pathCost);
-
-                if(pathCost < bestImprovementCost){
+                //Ignore micro improvements (1 second or less)
+                if(pathCost < bestImprovementCost && (bestImprovement - pathCost) > MIN_IMPROVEMENT + epsilon){
                     improvementFound = true; 
                     bestImprovement = newPath;
                     noImprovementCounter = 0;
                     bestImprovementCost = pathCost;
-
-                    // console.log("found");
                 }
             }
 
@@ -193,7 +190,7 @@ const localSearchWithTwoOpt = (nearestNeighbourSolution, nearestNeighbourCost, r
     return [bestImprovement, bestImprovementCost];
 }
 
-// calculate cost of the path 
+// Calculate the total cost of the path
 const costOfPath = (path, routeMetrics) =>{
     let sum = 0;
     for(let i=0; i < path.length - 1; i++){
