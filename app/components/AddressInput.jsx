@@ -1,7 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import ProcessFormData from '../backend/processData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,7 +12,8 @@ const DynamicAddressAutofill = dynamic(
 const AddressInput = () =>{
     const [location, setLocation] = useState({ longitude: null, latitude: null });
     const [mapboxToken, setMapboxToken] = useState('');
-
+    const [processedData, setProcessedData] = useState(null);
+    
     //Dynamically add an Input field when the "Add Another Stop" button is clicked 
 
     // The inputFields state is initialized as an array with one object that represents the first input field.
@@ -55,8 +55,6 @@ const AddressInput = () =>{
 
     const handleSuggestionSelect = (suggestion, index) => {
         
-        // console.log(suggestion.features[0].properties);
-        // console.log(index);
         const features = suggestion.features[0];
         const { place_name, context } = features.properties;  // Get the full place object
         const [longitude, latitude] = features.geometry.coordinates;
@@ -79,10 +77,6 @@ const AddressInput = () =>{
             }
         });
     
-        // console.log(`Address: ${place_name}`);
-        // console.log(`City: ${city}`);
-        // console.log(`Country: ${country}`);
-        // console.log(`Postal Code: ${postalCode}`);
     
         // Update the specific input field with full address details
         const updatedFields = [...finalInputFields];
@@ -96,22 +90,45 @@ const AddressInput = () =>{
             latitude
         };
         
-        setFinalInputFileds(updatedFields);  // Update state
+        setFinalInputFileds(updatedFields); 
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         // TODO: this is dependent on the user clicking the suggestion box, what if the user doesn't click it
         // check that the number of inputFields === finalInputFields
         // TODO: Form Validation (Addresses are valid, check that Form is not empty, Sanitize inputs etc)
-        ProcessFormData(finalInputFields); 
+        await processAddresses();
+    };
+
+    const processAddresses = async () => {
+       
+       
+        try {
+            const response = await fetch('/api/process-addresses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                next:{
+                    revalidate:0 //opt out of using cache
+                },
+                body: JSON.stringify(finalInputFields),
+            });
+
+            const data = await response.json();
+            setProcessedData(data.result);
+            console.log('Processed', data.result); //  PRINT: To console for now since frontend is not fully implemented yet
+
+        } 
+        catch (error) {
+            console.error('Error processing addresses:', error);
+        } 
     };
 
     
-
     useEffect(()=>{
-        
         const geoLocationOptions = {
             enableHighAccuracy: true, // More precise but may take longer and use more battery
             timeout: 5000,            // Maximum time allowed to get location
@@ -119,7 +136,7 @@ const AddressInput = () =>{
         };
 
         // Fetch the token from the backend
-       async function fetchMapboxToken() {
+        const fetchMapboxToken = async () => {
             try{
                 const response = await fetch('/api/mapbox');
                 if (!response.ok) {
@@ -134,8 +151,6 @@ const AddressInput = () =>{
 
         navigator.geolocation.getCurrentPosition((
             position) =>{
-                // console.log(position.coords.latitude);
-                // console.log(position.coords.longitude);
                 const {longitude , latitude} = position.coords;
                 setLocation({ longitude , latitude });
         },
@@ -145,7 +160,8 @@ const AddressInput = () =>{
         
         fetchMapboxToken();
     }, []);
-    
+
+
     if (!mapboxToken) return null;  // Wait for the token to be loaded
 
     return(
@@ -181,8 +197,8 @@ const AddressInput = () =>{
                         </DynamicAddressAutofill>
                     </div>
 
-                        {/* ------- Show Delete Button Only if the input fields are more than 2----------*/}
-                        {inputFields.length > 2 && (
+                    {/* ------- Show Delete Button Only if the input fields are more than 2----------*/}
+                    {inputFields.length > 2 && (
                         <button onClick={event => handleDeleteField(index, event)} className='flex-none ml-2'>
                             <FontAwesomeIcon icon={faTrash} />
                         </button>
