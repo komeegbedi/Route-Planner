@@ -13,9 +13,7 @@ const AddressInput = () =>{
     const [location, setLocation] = useState({ longitude: null, latitude: null });
     const [mapboxToken, setMapboxToken] = useState('');
     const [processedData, setProcessedData] = useState(null);
-    // const [isSubmitting, setIsSubmitting] = useState(false);
     
-
     //Dynamically add an Input field when the "Add Another Stop" button is clicked 
 
     // The inputFields state is initialized as an array with one object that represents the first input field.
@@ -119,11 +117,14 @@ const AddressInput = () =>{
        
         try {
             const response = await fetch('/api/process-addresses', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(finalInputFields),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                next:{
+                    revalidate:0 //opt out of using cache
+                },
+                body: JSON.stringify(finalInputFields),
             });
 
             const data = await response.json();
@@ -172,38 +173,7 @@ const AddressInput = () =>{
         fetchMapboxToken();
     }, []);
 
-    // useEffect(() => {
-    //     const processAddresses = async () => {
-       
-    //        if(isSubmitting){
-    //             try {
-    //                 const response = await fetch('/api/process-addresses', {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 body: JSON.stringify(finalInputFields),
-    //                 });
-        
-    //                 const data = await response.json();
-    //                 setProcessedData(data.result);
-    //                 console.log('Processed', data.result);
-        
-    //             } 
-    //             catch (error) {
-    //                 console.error('Error processing addresses:', error);
-    //             } 
-    //             finally{
-    //                 setIsSubmitting(false);
-    //             }
-    //        }
-        
-    //     };
 
-    //     processAddresses();
-    // }, [isSubmitting])
-
-    
     if (!mapboxToken) return null;  // Wait for the token to be loaded
 
     return(

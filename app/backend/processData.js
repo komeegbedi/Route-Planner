@@ -82,10 +82,15 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
     isVisited[routeMetrics.durations.length - 1] = true;
     optimizedTimeDuration += routeMetrics.durations[currentLocation][routeMetrics.durations.length - 1];
 
+    console.log("Before: "+ orderOfVisit);
+    let twoOptResult = localSearchWithTwoOpt(orderOfVisit, optimizedTimeDuration , routeMetrics);
+    orderOfVisit = twoOptResult[0];
+    optimizedTimeDuration = twoOptResult[1];
+
     // ===================== START DEBUG =====================
     // console.log(isVisited);
     // console.log('Processing directions:', directions);
-   console.log(orderOfVisit);
+   console.log("After: "+ orderOfVisit);
    //===================== END DEBUG =====================
 
    // order of visit 
@@ -97,7 +102,7 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
    })
    
   
-   const unOptimizedTime = routeMetrics.durations[0].reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+   const unOptimizedTime = costOfPath(Array(orderOfVisit.length).fill(0).map((_, i) => i), routeMetrics);
    const timeSaved = unOptimizedTime - optimizedTimeDuration;
    routeOptimizationResults[1] = Math.ceil(optimizedTimeDuration/60);
    routeOptimizationResults[2] = Math.ceil(unOptimizedTime/60);
@@ -112,3 +117,88 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
 
    return routeOptimizationResults;
 }//processDirections()
+
+/*
+    How the 2-Opt Local Search Algorithm works 
+
+    Original path: 0 → 2 → 4 → 1 → 3 → 5
+    Choose 2 non-adjacent edges (connections between cities that don't share a common city.)to swap:
+    Let's say edges (2→4) and (1→3)
+
+    Before swap:
+    0 → 2 → 4 → 1 → 3 → 5
+        |____|____|
+        edges to swap
+
+    After swap:
+    0 → 2 → 1 → 4 → 3 → 5
+    Note: the segment between swaps gets reversed
+
+    Original:
+    0 → 2 → 4 → 1 → 3 → 5
+        \_____/\_____/
+        Edge2  Edge4
+
+    Step 1: Break these two edges:
+    0 → 2    4 → 1    3 → 5
+
+    Step 2: The segment between our cuts (4,1) gets reversed to (1,4):
+    0 → 2 → 1 → 4 → 3 → 5
+*/
+
+const localSearchWithTwoOpt = (nearestNeighbourSolution, nearestNeighbourCost, routeMetrics) =>{
+
+    const MAX_ITERATIONS = 100;
+    const MIN_IMPROVEMENT = 1; //in seconds 
+    let noImprovementCounter = 0;
+    let currentIterationNumber = 0;
+    let bestImprovement = nearestNeighbourSolution;
+    let bestImprovementCost = nearestNeighbourCost;
+    let improvementFound = true;
+
+    while(currentIterationNumber < MAX_ITERATIONS && noImprovementCounter < 3){
+         improvementFound = false;
+
+        // Check all possible 2-opt swaps:
+
+        for(let i = 0; i < nearestNeighbourSolution.length - 2; i++){
+            for(let j = i + 2; j < nearestNeighbourSolution.length; j ++){
+
+                
+                let reservedSubArray = nearestNeighbourSolution.slice(i+1, j).reverse(); // get the sement between our swap and reverse it
+                let newPath = [...nearestNeighbourSolution.slice(0, i+1), ... reservedSubArray , ...nearestNeighbourSolution.slice(j)];
+                let pathCost = costOfPath(newPath, routeMetrics);
+
+                // console.log(newPath);
+                // console.log(pathCost);
+
+                if(pathCost < bestImprovementCost){
+                    improvementFound = true; 
+                    bestImprovement = newPath;
+                    noImprovementCounter = 0;
+                    bestImprovementCost = pathCost;
+
+                    // console.log("found");
+                }
+            }
+
+            if(!improvementFound){
+                noImprovementCounter++;
+            }
+        }
+
+        currentIterationNumber++;
+    }
+    
+    return [bestImprovement, bestImprovementCost];
+}
+
+// calculate cost of the path 
+const costOfPath = (path, routeMetrics) =>{
+    let sum = 0;
+    for(let i=0; i < path.length - 1; i++){
+        sum += routeMetrics.durations[path[i]][path[i+1]];
+    }
+
+    return sum; 
+}
