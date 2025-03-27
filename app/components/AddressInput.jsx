@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocationArrow, faCirclePlus,faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faLocationArrow, faCirclePlus, faXmark} from '@fortawesome/free-solid-svg-icons';
 
 const DynamicAddressAutofill = dynamic(
     () => import('@mapbox/search-js-react').then((mod) => mod.AddressAutofill),
@@ -191,7 +191,11 @@ const AddressInput = () =>{
                                 value={input.value}
                                 onChange={event => handleInputChange(index, event)}
                                 name={"address-"+index} autoComplete={"address-line-"+index}
-                                className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg w-full focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:border-gray-600 placeholder-gray-600" placeholder="Enter Stop Address"
+                                className="w-full p-4 rounded-xl bg-white/10 backdrop-blur-lg 
+                                    border border-white/20 text-white 
+                                    focus:ring-2 focus:ring-teal-500 
+                                    transition-all duration-300 
+                                    group-hover:scale-[1.02]" placeholder="Enter Stop Address"
                                 required
                             />
                         </DynamicAddressAutofill>
@@ -200,17 +204,24 @@ const AddressInput = () =>{
                     {/* ------- Show Delete Button Only if the input fields are more than 2----------*/}
                     {inputFields.length > 2 && (
                         <button onClick={event => handleDeleteField(index, event)} className='flex-none ml-2'>
-                            <FontAwesomeIcon icon={faTrash} />
+                            <FontAwesomeIcon icon={faXmark} />
                         </button>
                     )}
                 </div>
             ))}
 
-            <button className='block mt-5 font-medium px-1 tracking-wide' onClick={handleAddField}>
+            <button className='w-full p-3 text-teal-300 
+                        hover:text-teal-200 
+                        bg-white/5 rounded-xl 
+                        transition-all duration-300
+                        active:scale-95 
+                        hover:scale-[1.05] mt-5' onClick={handleAddField}>
                 <FontAwesomeIcon icon={faCirclePlus} /> Add Another Stop
             </button>
 
-            <button className ="text-white bg-gradient-to-l from-teal-400 hover:bg-gradient-to-r font-medium rounded-lg text-sm px-5 py-2.5 mt-8 text-center tracking-wide optimize">
+            <button className ="text-white bg-gradient-to-l from-teal-400 hover:bg-gradient-to-r font-medium rounded-lg text-sm px-5 py-2.5 mt-8 text-center tracking-wide optimize transition-all duration-300 
+                        active:scale-95 
+                        hover:scale-[1.05]">
                 Optimize Route  
                 <FontAwesomeIcon icon={faLocationArrow} /> 
             </button>

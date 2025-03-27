@@ -7,7 +7,7 @@ export async function ProcessData(data) {
         console.error('At least two entries are required for directions.');
         return;
     }
-    //TODO: Make sure to check that the addresses are not more than 20
+    //TODO: Make sure to check that the addresses are not more than 20 and they are more than 4 addresses
 
     // Constructing the coordinates string
     const coordinates = data.map(entry => `${entry.longitude},${entry.latitude}`).join(';');
@@ -84,11 +84,17 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
     optimizedTimeDuration += routeMetrics.durations[currentLocation][routeMetrics.durations.length - 1];
 
     // Apply the 2-opt local search algorithm to find a more optimal route by swapping edges
-    // in the current path and checking for improvements.
+    // in the current path and checking for improvements. Run only if Addresses > 3
    
-    let twoOptResult = localSearchWithTwoOpt(orderOfVisit, optimizedTimeDuration , routeMetrics);
-    orderOfVisit = twoOptResult[0];
-    optimizedTimeDuration = twoOptResult[1];
+    if(address.length > 3){
+        console.log("Before: "+ orderOfVisit);
+        console.log("Time: "+ optimizedTimeDuration);
+
+        let twoOptResult = localSearchWithTwoOpt(orderOfVisit, optimizedTimeDuration , routeMetrics);
+        orderOfVisit = twoOptResult[0];
+        optimizedTimeDuration = twoOptResult[1];
+        console.log("================================");
+    }
 
    
    let routeOptimizationResults = [];
@@ -119,11 +125,12 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
    return routeOptimizationResults;
 }//processDirections()
 
+
 /*
     How the 2-Opt Local Search Algorithm works 
 
     Original path: 0 → 2 → 4 → 1 → 3 → 5
-    Choose 2 non-adjacent edges (connections between cities that don't share a common city.)to swap:
+    Choose 2 non-adjacent edges (connections between addresses that don't share a common address.)to swap:
     Let's say edges (2→4) and (1→3)
 
     Before swap:
@@ -149,47 +156,69 @@ const optimizeRouteWithNearestNeighbor = (routeMetrics, address) => {
 
 const localSearchWithTwoOpt = (nearestNeighbourSolution, nearestNeighbourCost, routeMetrics) =>{
 
-    const MAX_ITERATIONS = 100;
-    const MIN_IMPROVEMENT = 1; //in seconds 
-    const epsilon = 1e-10; // Small tolerance value
-    let noImprovementCounter = 0;
-    let currentIterationNumber = 0;
-    let bestImprovement = nearestNeighbourSolution;
-    let bestImprovementCost = nearestNeighbourCost;
-    let improvementFound = true;
 
-    while(currentIterationNumber < MAX_ITERATIONS && noImprovementCounter < 3){
-         improvementFound = false;
-
-        // Check all possible 2-opt swaps:
-
-        for(let i = 0; i < nearestNeighbourSolution.length - 2; i++){
-            for(let j = i + 2; j < nearestNeighbourSolution.length; j ++){
-
-                
-                let reservedSubArray = nearestNeighbourSolution.slice(i+1, j).reverse(); // get the sement between our swap and reverse it
-                let newPath = [...nearestNeighbourSolution.slice(0, i+1), ... reservedSubArray , ...nearestNeighbourSolution.slice(j)];
-                let pathCost = costOfPath(newPath, routeMetrics);
-
-                //TODO: Ignore micro improvements (1 second or less)
-                if(pathCost < bestImprovementCost){
-                    improvementFound = true; 
-                    bestImprovement = newPath;
-                    noImprovementCounter = 0;
-                    bestImprovementCost = pathCost;
-                }
-            }
-
-            if(!improvementFound){
-                noImprovementCounter++;
-            }
-        }
-
-        currentIterationNumber++;
-    }
+    if(nearestNeighbourSolution.length < 3) // no point in 2-opt otherwise because it will contain "Starting point, One stop Address and Ending Point"
+        return;
     
-    return [bestImprovement, bestImprovementCost];
+    let bestImprovementFound; 
+    let bestPathFound;
+    let bestImprovementCostFound = nearestNeighbourCost;
+
+
 }
+
+// const localSearchWithTwoOpt = (nearestNeighbourSolution, nearestNeighbourCost, routeMetrics) =>{
+//     const MAX_ITERATIONS = 100;
+//     const MIN_IMPROVEMENT = 10; //in percentage
+//     const epsilon = 1e-10; // Small tolerance value
+//     let noImprovementCounter = 0;
+//     let currentIterationNumber = 0;
+//     let bestImprovement = nearestNeighbourSolution;
+//     let bestImprovementCost = nearestNeighbourCost;
+//     let improvementFound = true;
+
+//     if(nearestNeighbourSolution.length > 3){
+
+//         // while(currentIterationNumber < MAX_ITERATIONS && noImprovementCounter < 3){
+//             // improvementFound = false;
+   
+//            // Check all possible 2-opt swaps:
+//            for(let i = 0; i < nearestNeighbourSolution.length - 2; i++){
+//                for(let j = i + 2; j < nearestNeighbourSolution.length-1; j ++){
+   
+//                    let arraySegment = nearestNeighbourSolution.slice(i+1, j+1); 
+//                    let reversedSubArray = [...arraySegment].reverse(); // get the sement between our swap and reverse it
+//                 //    let newPath = [...nearestNeighbourSolution.slice(0, i+1), ... reversedSubArray , ...nearestNeighbourSolution.slice(j+1)];
+//                    let reversedPathCost = costOfPath(reversedSubArray, routeMetrics);
+//                    let segmentPathCost = costOfPath(arraySegment, routeMetrics);
+
+//                     console.log("================================");
+//                     console.log("i: " +i + " j: "+ j);
+//                     console.log("Reversed Array: "+reversedSubArray );
+//                     console.log("New Path: "+ newPath);
+//                     console.log("Cost: "+ pathCost);
+
+//                    //TODO: Ignore micro improvements (less than 10%). If each of the improvements gets better by less than 10%,
+//                    // we can ignore those mocro improvement
+//                    if(reversedPathCost < bestImprovementCost){
+//                        improvementFound = true; 
+//                        bestImprovement = newPath;
+//                        noImprovementCounter = 0;
+//                        bestImprovementCost = pathCost;
+//                    }
+//                }
+   
+//             //    if(!improvementFound){
+//             //        noImprovementCounter++;
+//             //    }
+//            }
+//           // currentIterationNumber++;
+//        //}
+
+//     }
+    
+//     return [bestImprovement, bestImprovementCost];
+// }
 
 // Calculate the total cost of the path
 const costOfPath = (path, routeMetrics) =>{
