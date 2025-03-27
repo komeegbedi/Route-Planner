@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <div className="App">
       <div className="content">
-        <div className="relative min-h-screen text-white items-center p-10">
+        <div className="relative min-h-screen text-white">
               <HeroSection/>
           </div>
       </div>
